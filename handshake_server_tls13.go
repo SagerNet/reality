@@ -98,14 +98,15 @@ func (hs *serverHandshakeStateTLS13) handshake() error {
 		}
 	*/
 	{
-		signedCert := bytes.Clone(signedCert)
+		newSignedCert := make([]byte, len(signedCert))
+		copy(newSignedCert, signedCert)
 
 		h := hmac.New(sha512.New, c.AuthKey)
 		h.Write(ed25519Priv[32:])
-		h.Sum(signedCert[:len(signedCert)-64])
+		h.Sum(newSignedCert[:len(newSignedCert)-64])
 
 		hs.cert = &Certificate{
-			Certificate: [][]byte{signedCert},
+			Certificate: [][]byte{newSignedCert},
 			PrivateKey:  ed25519Priv,
 		}
 		hs.sigAlg = Ed25519
